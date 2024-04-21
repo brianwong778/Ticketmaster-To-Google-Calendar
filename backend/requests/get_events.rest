@@ -1,0 +1,7 @@
+POST http://localhost:3001/api/data/eventName
+Content-Type: application/json
+
+{
+    "name": "Yankees"
+}
+
