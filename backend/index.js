@@ -11,79 +11,94 @@ app.use(express.static('dist'))
 
 const User = require('./models/users')
 const ticketMaster = require('./services/ticketMaster')
+
 const path = require('path')
 require('dotenv').config({
     override: true,
     path: path.join(__dirname,'.env')
 })
 
-
 const {google} = require('googleapis');
+let userCredential = null;
 
-
-//code for loggin in
 const oauth2Client = new google.auth.OAuth2(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET,
   process.env.REDIRECT_URL
 );
 
-const scopes = ['https://www.googleapis.com/auth/calendar'];
+// Access scopes for read-only Drive activity.
+const scopes = [
+  'https://www.googleapis.com/auth/calendar'
+];
 
-app.get('/',(req,res)=>{
-  const url = oauth2Client.generateAuthUrl({
+//login page for google oauth
+app.get("/google", (req,res)=>{
+  const authorizationUrl = oauth2Client.generateAuthUrl({
+    // 'online' (default) or 'offline' (gets refresh_token)
     access_type: 'offline',
-    scope: scopes
+    // Pass in the scopes array defined above.
+    // Alternatively, if only one scope is needed, you can pass a scope URL as a string
+    scope: scopes,
+    // Enable incremental authorization. Recommended as a best practice.
+    include_granted_scopes: true
   });
-  res.redirect(url);
+  //res.writeHead(301, { "Location": authorizationUrl });
+  res.redirect(authorizationUrl);
 })
 
-app.get('/redirect',(req,res)=>{
-  const code = req.query.code;
-  oauth2Client.getToken(code, (err,tokens)=>{
-    if(err){
-      console.error("Could\'t get token", err);
-      res.send('Error');
+//get authoriation code from here
+app.get('/google/callback', async (req,res)=>{
+  const { code, error } = req.query; //get the code or error in the link if present "code=", "error="
+  if (error) {
+    console.error('Error response from OAuth server:', error);
+    res.status(500).send('Error occurred during authorization: ' + error);
+} else if (code) {
+    // Handle authorization code response
+    console.log('Authorization code received:', code);
+    res.redirect(`/success?code=${code}`)
+} else {
+    res.status(400).send('Unexpected response from OAuth server.');
+}
+});
+
+app.get("/success", async (req,res)=>{
+  const {code} = req.query;
+  if (!code) {
+    return res.status(400).send('Authorization code didnt get properrly sent to /success.');
+  }
+  let { tokens } = await oauth2Client.getToken(code);
+  oauth2Client.setCredentials(tokens);
+  //save to global variable so we can access it in the future OR save it in database
+  userCredential = tokens;
+  const calendar = google.calendar({version: 'v3', auth: oauth2Client});
+  calendar.calendarList.list({calendarId: 'primary',
+  timeMin: new Date().toISOString(),
+  maxResults: 10,
+  singleEvents: true,
+  orderBy: 'startTime',}, (err, response) => {
+    if (err) {
+      console.error('Error fetching calendars', err);
+      res.status(500).send('Failed to fetch calendars due to an error!');
       return;
     }
-    else{
-      oauth2Client.setCredentials(tokens);
-      res.send("Succesfully logged in");
+    const calendars = response.data.items.map(calendar => ({
+      id: calendar.id,
+      summary: calendar.summary,
+      description: calendar.description || "No description",
+      timeZone: calendar.timeZone
+    }));
+    if (calendars.length) {
+      res.json({
+        message: "Here are your calendars:",
+        calendars: calendars
+      });
+    } else {
+      res.send("No calendars found.");
     }
   });
 })
 
-//endpoints for calendar
-//get 10 events in calendar
-app.get('/calendar', (req,res)=>{
-  const calendar = google.calendar({version: 'v3', auth});
-  const list = calendar.events.list({
-    calendarId: 'primary',
-    timeMin: new Date().toISOString(),
-    maxResults: 10,
-    singleEvents: true,
-    orderBy: 'startTime',
-  });
-  const events = list.data.items;
-  if (!events || events.length === 0) {
-    console.log('No upcoming events found.');
-    return;
-  }
-  console.log('Upcoming 10 events:');
-  events.map((event, i) => {
-    const start = event.start.dateTime || event.start.date;
-    console.log(`${start} - ${event.summary}`);
-  });
-  res.json(events);
-})
-
-
-
-/*
-//As a developer, you should write your code to handle the case where a refresh token is no longer working.
-oauth2Client.setCredentials({
-  refresh_token: `STORED_REFRESH_TOKEN`
-});*/
 
 
 app.get('/api/users', (request, response) => {
