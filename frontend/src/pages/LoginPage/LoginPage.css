@@ -1,0 +1,28 @@
+/* LoginPage.css */
+body, .login-container {
+    background-color: #f4f4f4; /* Set the background color for both the body and login container */
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: auto;
+    padding-top: 20px;
+}
+
+.login-button {
+    background-color: #4285F4; /* Google's brand color */
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-button:hover {
+    background-color: #357ae8;
+}

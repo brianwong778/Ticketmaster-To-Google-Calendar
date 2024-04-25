@@ -1,0 +1,8 @@
+.user {
+    background-color: #f8f9fa; /* Light grey background */
+    color: #333; /* Dark grey text */
+    padding: 20px; /* Padding around the text */
+    text-align: center; /* Center the text */
+    border-bottom: 1px solid #e0e0e0; /* Add a subtle border */
+    font-family: Arial, sans-serif; /* Font styling */
+}

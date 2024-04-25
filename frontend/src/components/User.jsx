@@ -1,9 +1,12 @@
-const User = ({user}) => {
-    return (
-      <li className='user'>
-        {user.firstName} {user.lastName}
-      </li>
-    )
-  }
+import React from 'react';
+import './User.css'; // Import the CSS for styling
 
-export default User
+const User = ({ user }) => {
+    return (
+        <header className='user'>
+            <h1>Welcome, {user.firstName} {user.lastName}!</h1>
+        </header>
+    );
+}
+
+export default User;

@@ -19,6 +19,7 @@ require('dotenv').config({
 })
 
 const {google} = require('googleapis');
+const { start } = require('repl')
 let userCredential = null;
 
 const oauth2Client = new google.auth.OAuth2(
@@ -43,7 +44,6 @@ app.get("/google", (req,res)=>{
     // Enable incremental authorization. Recommended as a best practice.
     include_granted_scopes: true
   });
-  //res.writeHead(301, { "Location": authorizationUrl });
   res.redirect(authorizationUrl);
 })
 
@@ -71,12 +71,13 @@ app.get("/success", async (req,res)=>{
   oauth2Client.setCredentials(tokens);
   //save to global variable so we can access it in the future OR save it in database
   userCredential = tokens;
-  const calendar = google.calendar({version: 'v3', auth: oauth2Client});
-  calendar.calendarList.list({calendarId: 'primary',
-  timeMin: new Date().toISOString(),
-  maxResults: 10,
-  singleEvents: true,
-  orderBy: 'startTime',}, (err, response) => {
+  //res.send("Successfully logged in! You can now access your calendars and events.");
+  res.redirect("/main")
+})
+
+app.get('/google/calendars', (req, res) => {
+  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  calendar.calendarList.list({}, (err, response) => {
     if (err) {
       console.error('Error fetching calendars', err);
       res.status(500).send('Failed to fetch calendars due to an error!');
@@ -97,8 +98,80 @@ app.get("/success", async (req,res)=>{
       res.send("No calendars found.");
     }
   });
-})
+});
 
+// Route to list events from a specified calendar
+app.get('/google/events', (req, res) => {
+  const calendarId = req.query.calendar ?? 'primary';
+  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  calendar.events.list({
+    calendarId,
+    timeMin: (new Date()).toISOString(),
+    maxResults: 10,
+    singleEvents: true,
+    orderBy: 'startTime'
+  }, (err, response) => {
+    if (err) {
+      console.error('Can\'t fetch events');
+      res.status(500).send('Failed to fetch events due to an error!');
+      return;
+    }
+    const events = response.data.items.map(event => ({
+      start: event.start.dateTime || event.start.date,
+      end: event.end.dateTime || event.end.date,
+      summary: event.summary,
+      description: event.description || "No description"
+    }));
+    if (events.length) {
+      res.json({
+        message: "Here are the upcoming events:",
+        events: events
+      });
+    } else {
+      res.send("No upcoming events found.");
+    }
+  });
+});
+
+app.post("/google/calendar/insert", async function (req,res){
+  try{
+    const name = req.body.name;
+    const startTime = req.body.time;
+    const date = req.body.date;
+
+    const tmpDate = new Date("2000-01-01T" + startTime); // Assuming the date portion is irrelevant and choosing an arbitrary date
+    tmpDate.setHours(tmpDate.getHours() + 1);
+    const endTime = tmpDate.toTimeString().slice(0, 8);
+
+    var event = {
+      'summary': `${name}`,
+      'start': {
+        'dateTime': `${date}T${startTime}-05:00`,
+        'timeZone': 'America/New_York',
+      },
+      'end': {
+        'dateTime': `${date}T${endTime}-05:00`,
+        'timeZone': 'America/New_York',
+      }
+    };
+    console.log("Im in backend insert event");
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+    //auth: auth,
+    calendar.events.insert({
+      calendarId: 'primary',
+      resource: event,
+    }, function(err, event) {
+      if (err) {
+        console.log('There was an error contacting the Calendar service: ' + err);
+        return;
+      }
+      console.log('Event created');
+    });
+  }
+  catch(error){
+    console.error("Error:", error);
+  }
+})
 
 
 app.get('/api/users', (request, response) => {
