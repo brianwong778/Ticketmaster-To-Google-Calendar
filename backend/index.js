@@ -154,7 +154,6 @@ app.post("/google/calendar/insert", async function (req,res){
         'timeZone': 'America/New_York',
       }
     };
-    console.log("Im in backend insert event");
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
     //auth: auth,
     calendar.events.insert({
@@ -180,6 +179,9 @@ app.get('/api/users', (request, response) => {
     })
 })
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 app.use("/api/data",ticketMaster)
 
 const PORT = process.env.PORT
