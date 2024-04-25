@@ -6,10 +6,6 @@ import MainPage from './pages/MainPage/MainPage';
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(false);
-    /*
-    <Route path="/" element={!loggedIn ? <LoginPage setLoggedIn={setLoggedIn} /> : <Navigate replace to="/google" />} />
-                    <Route path="/main" element={loggedIn ? <MainPage /> : <Navigate replace to="/" />} />
-    */
     return (
         <Router>
             <div className="App">

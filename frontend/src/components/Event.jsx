@@ -9,7 +9,6 @@ const Event = ({name,date,time}) => {
   eventName = name;
   eventDate = date;
   eventTime = time;
-
   const handleAddEvent = async (event) => {
     event.preventDefault(); // Prevent default form submission behavior; prevent submit button from submitting form
     //setSubmitted(true);
