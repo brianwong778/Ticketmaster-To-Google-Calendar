@@ -1,3 +1,4 @@
+//Problem: need (*) to access "/main"
 require('dotenv').config()
 const express = require('express')
 const app = express()
@@ -29,6 +30,7 @@ app.use("/api/data",ticketMaster)
 
 app.use("/",googleOAuthRoutes)
 
+//all ports
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
