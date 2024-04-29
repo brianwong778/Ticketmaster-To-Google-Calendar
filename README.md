@@ -59,7 +59,7 @@ To run this project locally, follow these steps:
      DATABASE_URL=
      CLIENT_ID=
      CLIENT_SECRET=
-     REDIRECT_URL=
+     REDIRECT_URL= http://localhost:3001/google/callback
   
     ```
 3. Deploy
