@@ -42,6 +42,8 @@ To run this project locally, follow these steps:
 1. Clone the repository and install dependencies:
    ```bash
    git clone git@github.com:IanTsai1/Ticketmaster-To-Google-Calendar.git
+   ```
+   ```bash
    cd backend
    npm install
    cd ../frontend
