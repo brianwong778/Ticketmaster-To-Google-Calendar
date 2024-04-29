@@ -67,5 +67,3 @@ To run this project locally, follow these steps:
    cd ../backend
    npm run deploy:full
    npm run dev
-
-
