@@ -10,7 +10,7 @@
 
 ## Demo Video
 <p align="center">
-  <a href="https://youtu.be/1crxym-nfXM?si=RgRm5Bpl7NWhiNZi">View Demo Video</a>
+  <a href="https://youtu.be/CQTsOuqM6ao?si=ns6kx-1jKcSKwS4a">View Demo Video</a>
 </p>
 
 ## How It Works
