@@ -16,7 +16,7 @@
 ## How It Works
 
 **Authentication and Initial Setup:**
-- **Login Page:** Users are greeted by a login page where they can sign in using Google OAuth2, facilitated by PassportJS.
+- **Login Page:** Users are greeted by a login page where they can sign in using Google OAuth2.
 - **Redirection:** Upon successful authentication, users are redirected to the main page of the application.
 
 **Event Searching and Management:**
@@ -31,7 +31,6 @@
 - **Database:** PostgreSQL
 - **APIs and Libraries:**
   - Google OAuth2 for authentication
-  - PassportJS for handling OAuth with Google
   - Ticketmaster API for event data
   - Google Calendar API for managing calendar events
 
