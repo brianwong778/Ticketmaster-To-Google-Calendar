@@ -5,7 +5,8 @@
 </p>
 
 <p align="center">
-  <img src="https://github.com/IanTsai1/Ticketmaster-To-Google-Calendar/assets/113395187/57451670-e15b-4dd8-a0ac-6b64b971b2d3" alt="Demo GIF">
+
+  <img src="https://github.com/user-attachments/assets/6bad981e-3861-4e58-96d9-7242e26e4f4e" alt="Demo GIF">
 </p>
 
 ## Demo Video
